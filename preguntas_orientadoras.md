@@ -1,6 +1,6 @@
 ## Preguntas orientadoras
 
-- [ ]  *Describa brevemente los diferentes perfiles de familias de microprocesadores/microcontroladores de ARM. Explique alguna de sus diferencias características.*
+- [X]  *Describa brevemente los diferentes perfiles de familias de microprocesadores/microcontroladores de ARM. Explique alguna de sus diferencias características.*
 
 |Familia |Ejemplos |Características |Casos de uso |
 ---| ---| ---| ---|
