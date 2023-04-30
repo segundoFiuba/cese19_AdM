@@ -1,7 +1,14 @@
 ## Preguntas orientadoras
 
 - [ ]  *Describa brevemente los diferentes perfiles de familias de microprocesadores/microcontroladores de ARM. Explique alguna de sus diferencias características.*
- Los perfiles son los siguientes.
+
+|Familia |Ejemplos |Características |Casos de uso |
+---| ---| ---| ---|
+Cortex A| A5, A7, A9| Microcontroladores de alto rendimiento, con mayores capacidades de memoria y soporte para sistemas operativos| Teléfonos celulares, dispositivos móviles.|
+Cortex R| R4, R5, R7, R8| Microcontroladores de alto rendimiento con capacidades de tiempo real, orientados a sistemas críticos| Equipos médicos, controladores para automóviles y equipamiento de la industria espacial.|
+Cortex M| M0, M0+, M3, M4 | Microcontroladores de menor rendimiento y capacidades, pero de bajo costo y bajo consumo de energía.| Dispositivos de bajo consumo, aplciaciones de IoT. |
+
+
 ## Cortex M
 
 - [ ] *Describa brevemente las diferencias entre las familias de procesadores Cortex M0, M3 y M4.*
