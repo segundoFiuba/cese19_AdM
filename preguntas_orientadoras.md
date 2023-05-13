@@ -11,7 +11,7 @@ Cortex M| M0, M0+, M3, M4 | Microcontroladores de menor rendimiento y capacidade
 
 ## Cortex M
 
-- [ ] *Describa brevemente las diferencias entre las familias de procesadores Cortex M0, M3 y M4.*
+- [X] *Describa brevemente las diferencias entre las familias de procesadores Cortex M0, M3 y M4.*
 - [ ] *¿Por qué se dice que el set de instrucciones Thumb permite mayor densidad de código? Explique*
 - [ ] *¿Qué entiende por arquitectura load-store? ¿Qué tipo de instrucciones no posee este tipo de arquitectura?*
 - [ ] *¿Cómo es el mapa de memoria de la familia?*
