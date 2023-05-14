@@ -40,7 +40,9 @@ El modelo otrogonal se refiere a que las instrucciones y los modos de address so
 
 ## ISA
 - [ ] *¿Qué son los sufijos y para qué se los utiliza? Dé un ejemplo*
+Los sufijos se agregan a algunas instrucciones de manera opcional. Éstos tienen como objetivo cambiar el resultado de la instrucción, como puede ser el sufijo ‘s’, que cambia los flags de APSR, o los sufijos para ejecución condicional.
 - [ ] *¿Para qué se utiliza el sufijo ‘s’? Dé un ejemplo*
+El sufijo ‘s’ se utiliza para indicarle al procesador que debe actualizar los valores de la ASPR (Application Program Status Register) con el resultado de la instrucción.
 - [ ] *¿Qué utilidad tiene la implementación de instrucciones de aritmética saturada? Dé un ejemplo con operaciones con datos de 8 bits.*
 - [ ] *Describa brevemente la interfaz entre assembler y C ¿Cómo se reciben los argumentos de las funciones? ¿Cómo se devuelve el resultado? ¿Qué registros deben guardarse en la pila antes de ser modificados?*
 - [ ] *¿Qué es una instrucción SIMD? ¿En qué se aplican y que ventajas reporta su uso? Dé un
