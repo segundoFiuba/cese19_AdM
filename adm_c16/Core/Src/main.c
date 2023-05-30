@@ -27,7 +27,17 @@
 
 /* Private typedef -----------------------------------------------------------*/
 /* USER CODE BEGIN PTD */
-
+#define TEST_1 0
+#define TEST_2 0
+#define TEST_3 0
+#define TEST_4 1
+#define TEST_5 0
+#define TEST_6 0
+#define TEST_7 0
+#define TEST_8 0
+#define TEST_9 0
+#define TEST_10 0
+#define TEST_11 0
 /* USER CODE END PTD */
 
 /* Private define ------------------------------------------------------------*/
@@ -160,6 +170,48 @@ int main(void)
   const uint32_t Resultado = asm_sum (5, 3);
   /* USER CODE END 2 */
 
+#if TEST_1
+	  uint32_t vector_test_zeros[3]={1,2,3};
+	  zeros(vector_test_zeros,3);
+	  if(!vector_test_zeros[0] && !vector_test_zeros[1] && !vector_test_zeros[2]){
+		  HAL_UART_Transmit(&huart3,"TEST 1 PASS",12,1000);
+	  } else {
+		  HAL_UART_Transmit(&huart3,"TEST 1 PASS",12,1000);
+	  }
+#endif
+#if TEST_2
+	  uint32_t vectorIn[] = {1,2,3,0x10000000};
+	  uint32_t vectorOut[4];
+	  uint32_t escalar=15;
+	  productoEscalar32(vectorIn, vectorOut, 4, escalar);
+	  if(vectorOut[0]==15 && vectorOut[1]==30 && vectorOut[2]==45 && vectorOut[3]==0xF0000000){
+		  HAL_UART_Transmit(&huart3,"TEST 2 PASS",12,1000);
+	  } else {
+		  HAL_UART_Transmit(&huart3,"TEST 2 FAIL",12,1000);
+	  }
+#endif
+#if TEST_3
+	  uint16_t vectorIn[] = {1,2,3,0x1000};
+	  uint16_t vectorOut[4];
+	  uint16_t escalar=15;
+	  productoEscalar16(vectorIn, vectorOut, 4, escalar);
+	  if(vectorOut[0]==15 && vectorOut[1]==30 && vectorOut[2]==45 && vectorOut[3]==0xF000){
+		  HAL_UART_Transmit(&huart3,"TEST 3 PASS",12,1000);
+	  } else {
+		  HAL_UART_Transmit(&huart3,"TEST 3 FAIL",12,1000);
+	  }
+#endif
+#if TEST_4
+	  uint16_t vectorIn[] = {1,2,3,0x1000};
+	  uint16_t vectorOut[4];
+	  uint16_t escalar=15;
+	  productoEscalar12(vectorIn, vectorOut, 4, escalar);
+	  if(vectorOut[0]==15 && vectorOut[1]==30 && vectorOut[2]==45 && vectorOut[3]==0xFFF){
+		  HAL_UART_Transmit(&huart3,"TEST 4 PASS",12,1000);
+	  } else {
+		  HAL_UART_Transmit(&huart3,"TEST 4 FAIL",12,1000);
+	  }
+#endif
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1)
