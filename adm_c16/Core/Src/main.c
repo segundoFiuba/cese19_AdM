@@ -385,6 +385,35 @@ static void MX_GPIO_Init(void)
 }
 
 /* USER CODE BEGIN 4 */
+/*Realizar una función que inicialice un vector con ceros.  */
+void zeros(uint32_t * array, uint32_t len) {
+	for(; len > 0; len--) {
+		array[len] = 0;
+	}
+	array[len]=0;
+}
+
+/*Realizar una función que realice el producto de un vector y un escalar */
+void productoEscalar32(uint32_t * vectorIn, uint32_t * vectorOut, uint32_t longitud, uint32_t escalar) {
+	for( ;longitud>0 ; longitud--) {
+		vectorOut[longitud-1] =vectorIn[longitud-1] * escalar;
+	}
+}
+/* Adapte la función del ejercicio 2 para realizar operaciones sobre vectores de 16 bits. */
+void productoEscalar16(uint16_t * vectorIn, uint16_t * vectorOut, uint32_t longitud, uint16_t escalar) {
+	for( ;longitud>0 ; longitud--) {
+		vectorOut[longitud-1] =vectorIn[longitud-1] * escalar;
+	}
+}
+/* Adapte la función del ejercicio 3 para saturar el resultado del producto a 12 bits. */
+void productoEscalar12(uint16_t * vectorIn, uint16_t * vectorOut, uint32_t longitud, uint16_t escalar) {
+	for( ;longitud>0 ; longitud--) {
+		vectorOut[longitud-1] =vectorIn[longitud-1] * escalar;
+		if(vectorOut[longitud-1] > 0xFFF) {//0xFFF=0b111111111111
+			vectorOut[longitud-1] = 0xFFF;
+		}
+	}
+}
 
 /* USER CODE END 4 */
 
