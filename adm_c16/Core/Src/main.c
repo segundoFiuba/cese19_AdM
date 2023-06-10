@@ -212,6 +212,28 @@ int main(void)
 		  HAL_UART_Transmit(&huart3,"TEST 4 FAIL",12,1000);
 	  }
 #endif
+#if TEST_5
+
+#endif
+#if TEST_6
+	  uint32_t vectorIn[] = {1,2,3,0x10000000};
+	  uint16_t vectorOut[4];
+	  pack32to16(vectorIn, vectorOut, 4);
+	  if(vectorOut[0]==1 && vectorOut[1]==2 && vectorOut[2]==3 && vectorOut[3]==0xFFFF){
+		  HAL_UART_Transmit(&huart3,"TEST 6 PASS",12,1000);
+	  } else {
+		  HAL_UART_Transmit(&huart3,"TEST 6 FAIL",12,1000);
+	  }
+#endif
+#if TEST_7
+	  int32_t vectorIn[] = {1,2,3,0x10000000};
+	  uint32_t pos = max(vectorIn, 4);
+	  if(pos==3){
+		  HAL_UART_Transmit(&huart3,"TEST 7 PASS",12,1000);
+	  } else {
+		  HAL_UART_Transmit(&huart3,"TEST 7 FAIL",12,1000);
+	  }
+#endif
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1)
@@ -467,6 +489,33 @@ void productoEscalar12(uint16_t * vectorIn, uint16_t * vectorOut, uint32_t longi
 	}
 }
 
+/* Realice una función que implemente un filtro de ventana móvil de 10 valores sobre un vector de
+muestras*/
+
+void filtroVentana10(uint16_t * vectorIn, uint16_t * vectorOut, uint32_t longitudVectorIn){
+
+}
+
+/*  Realizar una función que reciba un vector de números signados de 32 bits y los “empaquete” en
+otro vector de 16 bits. La función deberá adecuar los valores de entrada a la nueva precisión*/
+
+void pack32to16(int32_t * vectorIn, int16_t *vectorOut, uint32_t longitud){
+	for(; longitud > 0; longitud--) {
+		vectorOut[longitud-1] = vectorIn[longitud-1]>0xFFFF ? 0xFFFF : (int16_t)vectorIn[longitud-1];
+	}
+}
+
+/* Realizar una función que reciba un vector de números signados de 32 bits y devuelva la posición
+del máximo del vector*/
+int32_t max(int32_t * vectorIn, uint32_t longitud){
+	int32_t pos=longitud-1;
+	for(; longitud > 0; longitud--) {
+		if(vectorIn[longitud-1]>vectorIn[pos]){
+			pos = longitud-1;
+		}
+	}
+	return pos;
+}
 /* USER CODE END 4 */
 
 /**
