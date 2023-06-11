@@ -200,3 +200,57 @@
         mov r0, r3 @copy return value to r0
         pop {r4-r5} @restore
     	bx lr
+
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+@ Prototipo en "C":
+@   void productoEscalar12(uint16_t * vectorIn, uint16_t * vectorOut, uint32_t longitud, uint16_t escalar)
+@	r0 direction of vectorIn
+@	r1 direction of vectorOut
+@	r2 lenght of arrays
+@	r3 factor
+.thumb_func
+	asm_downsampleN:
+		bx lr
+
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+@ Prototipo en "C":
+@   void productoEscalar12(uint16_t * vectorIn, uint16_t * vectorOut, uint32_t longitud, uint16_t escalar)
+@	r0 direction of vectorIn
+@	r1 direction of vectorOut
+@	r2 lenght of arrays
+@	r3 factor
+.thumb_func
+	asm_invertir:
+		bx lr
+
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+@ Prototipo en "C":
+@   void echo(uint16_t * vectorIn, uint32_t longitud)
+@	r0 direction of vectorIn
+@	r1 lenght of array
+.thumb_func
+	asm_echo:
+
+		bx lr
+
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+@ Prototipo en "C":
+@   void productoEscalar12(uint16_t * vectorIn, uint16_t * vectorOut, uint32_t longitud, uint16_t escalar)
+@	r0 direction of vectorIn
+@	r1 direction of vectorOut
+@	r2 lenght of arrays
+@	r3 factor
+.thumb_func
+	asm_echo_simd:
+		bx lr
+
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+@ Prototipo en "C":
+@   void productoEscalar12(uint16_t * vectorIn, uint16_t * vectorOut, uint32_t longitud, uint16_t escalar)
+@	r0 direction of vectorIn
+@	r1 direction of vectorOut
+@	r2 lenght of arrays
+@	r3 factor
+.thumb_func
+	asm_corr:
+		bx lr

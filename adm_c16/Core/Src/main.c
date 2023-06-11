@@ -30,14 +30,14 @@
 #define TEST_1 0
 #define TEST_2 0
 #define TEST_3 0
-#define TEST_4 1
+#define TEST_4 0
 #define TEST_5 0
 #define TEST_6 0
 #define TEST_7 0
 #define TEST_8 0
 #define TEST_9 0
 #define TEST_10 0
-#define TEST_11 0
+#define TEST_11 1
 /* USER CODE END PTD */
 
 /* Private define ------------------------------------------------------------*/
@@ -233,6 +233,67 @@ int main(void)
 	  } else {
 		  HAL_UART_Transmit(&huart3,"TEST 7 FAIL",12,1000);
 	  }
+#endif
+#if TEST_8
+	  int32_t vectorIn[] = {1,2,3,4,5,6,7};
+	  int32_t vectorOut[7];
+	  downsampleN(vectorIn, vectorOut, 7,3);
+	  if(vectorOut[0]==1 && vectorOut[1]==2 && vectorOut[2]==4 && vectorOut[3]==5 && vectorOut[4]==7){
+		  HAL_UART_Transmit(&huart3,"TEST 8 PASS",12,1000);
+	  } else {
+		  HAL_UART_Transmit(&huart3,"TEST 8 FAIL",12,1000);
+	  }
+
+#endif
+#if TEST_9
+	  //invertir(uint16_t * vector, uint32_t longitud)
+	  uint16_t vectorIn[] = {1,2,3,4,5,6,7};
+	  invertir(vectorIn,7);
+	  if(vectorIn[0]==7
+			  && vectorIn[1]==6
+			  && vectorIn[2]==5
+			  && vectorIn[3]==4
+			  && vectorIn[4]==3
+			  && vectorIn[5]==2
+			  && vectorIn[6]==1){
+		  HAL_UART_Transmit(&huart3,"TEST 9 PASS",12,1000);
+	  } else {
+		  HAL_UART_Transmit(&huart3,"TEST 9 FAIL",12,1000);
+	  }
+#endif
+#if TEST_10
+	  //echo(uint16_t * vectorIn, uint32_t longitud)
+	  uint16_t vectorIn[882*2];
+	  for(int i=0; i<882*2;i++){
+		  vectorIn[i] = 10;
+	  }
+	  echo(vectorIn, 882*2);
+	  if(vectorIn[0]==10
+			  && vectorIn[881]==10
+			  && vectorIn[882]==15
+			  && vectorIn[882*2-1]==15){
+		  HAL_UART_Transmit(&huart3,"TEST 10 PASS",12,1000);
+	  } else {
+		  HAL_UART_Transmit(&huart3,"TEST 10 FAIL",12,1000);
+	  }
+
+#endif
+#if TEST_11
+	  //corr(int16_t *vectorX, int16_t * vectorY, int16_t* vectorCorr, uint32_t longitud)
+	  int16_t vectorX[]={1,1,1};
+	  int16_t vectorY[]={1,1,1};
+	  int16_t vectorCorr[5]={0,0,0,0,0};
+	  corr(vectorX, vectorY, vectorCorr, 3);
+	  if(vectorCorr[0]==1
+			  && vectorCorr[1]==2
+			  && vectorCorr[2]==3
+			  && vectorCorr[3]==2
+			  && vectorCorr[4]==1){
+		  HAL_UART_Transmit(&huart3,"TEST 11 PASS",12,1000);
+	  } else {
+		  HAL_UART_Transmit(&huart3,"TEST 11 FAIL",12,1000);
+	  }
+
 #endif
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
@@ -516,6 +577,91 @@ int32_t max(int32_t * vectorIn, uint32_t longitud){
 	}
 	return pos;
 }
+/* Realizar una función que reciba un vector de muestras signadas de 32 bits y lo decime
+descartando una cada N muestras. */
+void downsampleN(int32_t * vectorIn, int32_t * vectorOut, uint32_t longitud, uint32_t N){
+	int j=0;
+	for(int i=0; i < longitud; i++){
+		if(!((i+1)%N)) continue;
+		vectorOut[j]=vectorIn[i];
+		j++;
+	}
+}
+/* Realizar una función que reciba un vector de muestras no signadas de 16 bits e invierta su orden.*/
+void invertir(uint16_t * vector, uint32_t longitud){
+	uint16_t buff;
+	for(int i=0; i<longitud/2; i++ ){
+		buff = vector[i];
+		vector[i]=vector[longitud-1-i];
+		vector[longitud-1-i]=buff;
+	}
+}
+
+/* Realizar una función que recibe un vector de 4096 valores de 16 bits (signados), que
+corresponden a muestras de audio tomadas a una tasa de muestreo de 44.100 muestras/s. La función
+debe introducir un “eco” de la mitad de la amplitud de la muestra original a los 20ms de comenzada
+la grabación.*/
+#define DELAY_SAMPLES = 882
+void echo(uint16_t * vectorIn, uint32_t longitud){
+	uint16_t delay = 882;
+	for(int i=delay; i<longitud; i++){
+		vectorIn[i] = vectorIn[i]+vectorIn[i-delay]/2;
+	}
+}
+
+/* Realizar una función que calcule la correlación entre dos vectores. */
+void corr(int16_t *vectorX, int16_t * vectorY, int16_t* vectorCorr, uint32_t longitud){
+	//vectorX y vectorY tienen tamaño L -> vectorCorr tiene tamaño 2L-1
+	//corr entre [1,1] y [1,1] es [1,2,1]
+	//corr entre [1,1] y [-2,-1] es [-1,-3,-2]
+
+	/**
+	 * 	vectorCorr[0] = vectorX[0]*vectorY[longitud-1];
+	 *	vectorCorr[1] = vectorX[0]*vectorY[longitud-2]+vectorX[1]*vectorY[longitud-1];
+	 *	vectorCorr[2] = vectorX[0]*vectorY[longitud-3]+vectorX[1]*vectorY[longitud-2]+vectorX[2]*vectorY[longitud-1];
+
+	 *	vectorCorr[longitud-1] = vectorX[0]*vectorY[0]+vectorX[1]*vectorY[1]+...+vectorX[longitud-1]*vectorY[longitud-1];
+
+	 *	vectorCorr[2*longitud-2] = vectorX[longitud-2]*vectorY[0]+vectorX[longitud-1]*vectorY[1];
+	 *	vectorCorr[2*longitud-1] = vectorX[longitud-1]*vectorY[0];
+	 */
+
+	uint32_t len_corr = 2*longitud-1;
+	for(uint32_t i=0;i<longitud;i++) {
+		for(uint32_t j=0;j<=i;j++) {
+			vectorCorr[i]=vectorCorr[i]+vectorX[j]*vectorY[longitud-1-i+j];
+		}
+	}
+	for(uint32_t i=0;i<longitud-1;i++) {
+		for(uint32_t j=0;j<=i;j++) {
+			vectorCorr[len_corr-i-1]=vectorCorr[len_corr-i-1]+vectorY[j]*vectorX[longitud-1-i+j];
+		}
+	}
+
+}
+
+
+void corr2(int16_t *vectorX, uint32_t longitudX, int16_t * vectorY, uint32_t longitudY, int16_t* vectorCorr){
+	//longitud del vector de correlación lenX+lenY-1
+	uint32_t len_corr = longitudX+longitudY-1;
+	for(uint32_t i=0;i<longitudY;i++) {
+		for(uint32_t j=0;j<=i;j++) {
+			vectorCorr[i]=vectorCorr[i]+vectorX[j]*vectorY[longitudY-1-i+j];
+		}
+	}
+	for(uint32_t i=0;i<longitudX-1;i++) {
+		for(uint32_t j=0;j<=i;j++) {
+			vectorCorr[len_corr-i-1]=vectorCorr[len_corr-i-1]+vectorY[j]*vectorX[longitudX-1-i+j];
+		}
+	}
+
+}
+
+void filtroVentana10_2(uint16_t * vectorIn, uint16_t * vectorOut, uint32_t longitudVectorIn){
+	uint16_t vectorY[10]={1,1,1,1,1,1,1,1,1,1};
+	corr2(vectorIn,longitudVectorIn, vectorY,10, vectorOut);
+}
+
 /* USER CODE END 4 */
 
 /**
