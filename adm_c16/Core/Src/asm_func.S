@@ -5,7 +5,19 @@
 @ Simbolos exportados
 .global asm_svc
 .global asm_sum
-
+.global asm_zeros
+.global asm_productoEscalar32
+.global asm_productoEscalar16
+.global asm_productoEscalar12
+.global asm_filtroVentana10
+.global asm_pack32to16
+.global asm_max
+.global asm_downsampleN
+.global asm_invertir
+.global asm_invertir
+.global asm_echo
+.global asm_echo_simd
+.global asm_corr
 
 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 @ Prototipo en "C":
@@ -75,7 +87,7 @@
     	cbz r2, exit_prod32 @ compare with zero, exit if true
     	push {r4,r5}
     asm_32_loop:
-    	mov r5, r0 @ copy the value in r0 to the buffer r5
+    	ldr r5, [r0], #4 @ copy the value in r0 to the buffer r5
 		mul r4, r5, r3 @ multiply value pointed to by r0 with value in r3
 		str r4, [r1], #4  @ store the result in r1 and update r1 to r1+4
 		subs r2, #1
@@ -98,7 +110,7 @@
     	cbz r2, exit_prod16 @ compare with zero, exit if true
     	push {r4,r5}
     asm_16_loop:
-        mov r5, r0 @ copy the value in r0 to the buffer r5
+    	ldr r5, [r0], #2 @ copy the value in r0 to the buffer r5
 		mul r4, r5, r3 @ multiply value pointed to by r0 with value in r3
 		strh r4, [r1], #2  @ store the result in r1 and update r1 to r1+2 (HALF WORD)
 		subs r2, #1
@@ -121,7 +133,7 @@
     	cbz r2, exit_prod12 @ compare with zero, exit if true
     	push {r4,r5}
     asm_12_loop:
-        mov r5, r0 @ copy the value in r0 to the buffer r5
+        ldr r5, [r0], #2 @ copy the value in r0 to the buffer r5
 		mul r4, r5, r3 @ multiply value pointed to by r0 with value in r3
 		strh r4, [r1], #2  @ store the result in r1 and update r1 to r1+2 (HALF WORD)
 		subs r2, #1
@@ -151,21 +163,24 @@
 		cbz r0, exit_pack @ compare with null pointer, exit if true
     	cbz r1, exit_pack @ compare with null pointer, exit if true
     	cbz r2, exit_pack @ compare with zero, exit if true
+    	push {r4}
 	pack_loop:
 		mov r3, #4095
-		cmp r0, r3
+		ldr r4, [r0], #4
+		cmp r4, r3
 		bgt branch_upper_limit
-		mov r3, r0
-		strh r3, [r0], #2
+		mov r3, r4
+		strh r3, [r1], #2
 		subs r2, #1
 		bne pack_loop
 		b exit_pack
 	branch_upper_limit:
 		mov r3, 0xFFFF
-		strh r3, [r0], #2
+		strh r3, [r1], #2
 		subs r2, #1
 		bne pack_loop
 	exit_pack:
+		pop {r4}
 		bx lr
 
 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
@@ -183,17 +198,17 @@
     	mov r5, #0 @ counting variable
     max_loop:
     	ldr r4, [r0], #4 @load to r4 the value of r0, and increment r0 one word
-    	cmp r2, r4 @compare r0 with current max
+    	cmp r4, r2 @compare r0 with current max
     	bgt new_max @if greater than, jump to new max
     	add r5, #1 @add 1 to the counter
-    	subs r2, #1 @decrease 1 from the long
+    	subs r1, #1 @decrease 1 from the long
     	bne max_loop @branch back to loop
     	b exit_max @branch exit
     new_max:
     	mov r2, r4 @ new max, set the value of max to the value of r4
-    	add r5, #1 @increase the counter
     	mov r3, r5 @set the location of maximum value to counter
-    	subs r2, #1 @decrease the longitud
+    	add r5, #1 @increase the counter
+    	subs r1, #1 @decrease the longitud
     	bne max_loop
     exit_max:
         mov r0, r3 @copy return value to r0
@@ -213,22 +228,24 @@
     	cbz r1, exit_downsample @ compare with null pointer, exit if true
     	cbz r2, exit_downsample @ compare length to 0, exit if true
     	cbz r3, exit_downsample @ compare N to 0, exit if true
-    	push {r4} @push r4, popping later
+    	push {r4,r5} @push r4, popping later
     	mov r4, #1 @used to compare with N
 	downsample_loop:
 		cmp r4, r3 @compare N to looping variable
 		beq equal_downsample @if equal dont store it
-		str r1, [r0], #4 @if not equal store it
 		add r4, #1 @increase the looping variable
 		subs r2,#1 @decrease length, set ASPR
+		ldr r5, [r0], #4
+		str r5, [r1], #4 @if not equal store it
 		bne downsample_loop @if length is not zero loop again
 		b exit_downsample @if length is zero exit
 	equal_downsample:
 		mov r4, #1 @if equal then restore looping variable to zero
+		ldr r5, [r0], #4
 		subs r2, #1 @substract from length, set ASPR
 		bne downsample_loop @if not zero loop again
 	exit_downsample:
-		pop {r4}
+		pop {r4,r5}
 		bx lr
 
 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
@@ -244,13 +261,13 @@
     	mov r3, r1 @load the length into r3
     	mov r4, r0 @load the address of the vector in r4
 	invertir_push_loop:
-		ldr r2, [r0], #4 @ read the value in r0 then move r0 one word
+		ldrh r2, [r0], #2 @ read the value in r0 then move r0 one word
 		push {r2} @ push the value to the stack
 		subs r1, #1 @ substract one from length, update ASPR
 		bne invertir_push_loop
 	invertir_pop_loop:
 		pop {r2} @get the last item from the stack
-		ldr r4, [r2], #4 @save that value in r4, which is the address of the vector, and increase 4
+		strh r2, [r4], #2 @save that value in r4, which is the address of the vector, and increase 4
 		subs r3, #1
 		bne invertir_pop_loop
 	exit_invertir:
@@ -265,7 +282,7 @@
 .thumb_func
 	asm_echo:
 		cbz r0, exit_echo @ compare with null pointer, exit if true
-		push{r4-r5}
+		push {r4-r5}
 		mov r5, #882
 		subs r1, r5 @compare with minimum size
 		bmi exit_echo @if negative exit
@@ -280,7 +297,7 @@
 		subs r1, #1
 		bne echo_loop
 	exit_echo:
-		pop{r4-r5}
+		pop {r4-r5}
 		bx lr
 
 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
@@ -292,8 +309,8 @@
 @	r3 factor
 .thumb_func
 	asm_echo_simd:
-		cbz r0, exit_echo @ compare with null pointer, exit if true
-		push{r4-r6}
+		cbz r0, exit_echo_simd @ compare with null pointer, exit if true
+		push {r4-r6}
 		mov r5, #882
 		subs r1, r5 @compare with minimum size
 		bmi exit_echo @if negative exit
@@ -313,7 +330,7 @@
 		subs r1, #2
 		bne echo_loop
 	exit_echo_simd:
-		pop{r4-r6}
+		pop {r4-r6}
 		bx lr
 
 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@

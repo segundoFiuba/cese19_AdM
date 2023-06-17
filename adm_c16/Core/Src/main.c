@@ -28,16 +28,28 @@
 /* Private typedef -----------------------------------------------------------*/
 /* USER CODE BEGIN PTD */
 #define TEST_1 0
+#define TEST_1_ASM 0
 #define TEST_2 0
+#define TEST_2_ASM 0
 #define TEST_3 0
+#define TEST_3_ASM 0
 #define TEST_4 0
+#define TEST_4_ASM 0
 #define TEST_5 0
+#define TEST_5_ASM 0
 #define TEST_6 0
+#define TEST_6_ASM 0
 #define TEST_7 0
+#define TEST_7_ASM 0
 #define TEST_8 0
+#define TEST_8_ASM 0
 #define TEST_9 0
+#define TEST_9_ASM 0
 #define TEST_10 0
-#define TEST_11 1
+#define TEST_10_ASM 0
+#define TEST_10_ASM_SIMD 1
+#define TEST_11 0
+#define TEST_11_ASM 0
 /* USER CODE END PTD */
 
 /* Private define ------------------------------------------------------------*/
@@ -176,7 +188,16 @@ int main(void)
 	  if(!vector_test_zeros[0] && !vector_test_zeros[1] && !vector_test_zeros[2]){
 		  HAL_UART_Transmit(&huart3,"TEST 1 PASS",12,1000);
 	  } else {
-		  HAL_UART_Transmit(&huart3,"TEST 1 PASS",12,1000);
+		  HAL_UART_Transmit(&huart3,"TEST 1 FAIL",12,1000);
+	  }
+#endif
+#if TEST_1_ASM
+	  uint32_t vector_test_zeros[3]={1,2,3};
+	  asm_zeros(vector_test_zeros,3);
+	  if(!vector_test_zeros[0] && !vector_test_zeros[1] && !vector_test_zeros[2]){
+		  HAL_UART_Transmit(&huart3,"TEST 1 ASM PASS",16,1000);
+	  } else {
+		  HAL_UART_Transmit(&huart3,"TEST 1 ASM FAIL",16,1000);
 	  }
 #endif
 #if TEST_2
@@ -190,6 +211,17 @@ int main(void)
 		  HAL_UART_Transmit(&huart3,"TEST 2 FAIL",12,1000);
 	  }
 #endif
+#if TEST_2_ASM
+	  uint32_t vectorIn[] = {1,2,3,0x10000000};
+	  uint32_t vectorOut[4];
+	  uint32_t escalar=15;
+	  asm_productoEscalar32(vectorIn, vectorOut, 4, escalar);
+	  if(vectorOut[0]==15 && vectorOut[1]==30 && vectorOut[2]==45 && vectorOut[3]==0xF0000000){
+		  HAL_UART_Transmit(&huart3,"TEST 2 ASM PASS",15,1000);
+	  } else {
+		  HAL_UART_Transmit(&huart3,"TEST 2 ASM FAIL",15,1000);
+	  }
+#endif
 #if TEST_3
 	  uint16_t vectorIn[] = {1,2,3,0x1000};
 	  uint16_t vectorOut[4];
@@ -199,6 +231,17 @@ int main(void)
 		  HAL_UART_Transmit(&huart3,"TEST 3 PASS",12,1000);
 	  } else {
 		  HAL_UART_Transmit(&huart3,"TEST 3 FAIL",12,1000);
+	  }
+#endif
+#if TEST_3_ASM
+	  uint16_t vectorIn[] = {1,2,3,0x1000};
+	  uint16_t vectorOut[4];
+	  uint16_t escalar=15;
+	  asm_productoEscalar16(vectorIn, vectorOut, 4, escalar);
+	  if(vectorOut[0]==15 && vectorOut[1]==30 && vectorOut[2]==45 && vectorOut[3]==0xF000){
+		  HAL_UART_Transmit(&huart3,"TEST 3 ASM PASS",15,1000);
+	  } else {
+		  HAL_UART_Transmit(&huart3,"TEST 3 ASM FAIL",15,1000);
 	  }
 #endif
 #if TEST_4
@@ -212,7 +255,21 @@ int main(void)
 		  HAL_UART_Transmit(&huart3,"TEST 4 FAIL",12,1000);
 	  }
 #endif
+#if TEST_4_ASM
+	  uint16_t vectorIn[] = {1,2,3,0x1000};
+	  uint16_t vectorOut[4];
+	  uint16_t escalar=15;
+	  asm_productoEscalar12(vectorIn, vectorOut, 4, escalar);
+	  if(vectorOut[0]==15 && vectorOut[1]==30 && vectorOut[2]==45 && vectorOut[3]==0xFFF){
+		  HAL_UART_Transmit(&huart3,"TEST 4 ASM PASS",15,1000);
+	  } else {
+		  HAL_UART_Transmit(&huart3,"TEST 4 ASM FAIL",15,1000);
+	  }
+#endif
 #if TEST_5
+
+#endif
+#if TEST_5_ASM
 
 #endif
 #if TEST_6
@@ -225,6 +282,16 @@ int main(void)
 		  HAL_UART_Transmit(&huart3,"TEST 6 FAIL",12,1000);
 	  }
 #endif
+#if TEST_6_ASM
+	  uint32_t vectorIn[] = {1,2,3,0x10000000};
+	  uint16_t vectorOut[4];
+	  asm_pack32to16(vectorIn, vectorOut, 4);
+	  if(vectorOut[0]==1 && vectorOut[1]==2 && vectorOut[2]==3 && vectorOut[3]==0xFFFF){
+		  HAL_UART_Transmit(&huart3,"TEST 6 ASM PASS",15,1000);
+	  } else {
+		  HAL_UART_Transmit(&huart3,"TEST 6 ASM FAIL",15,1000);
+	  }
+#endif
 #if TEST_7
 	  int32_t vectorIn[] = {1,2,3,0x10000000};
 	  uint32_t pos = max(vectorIn, 4);
@@ -232,6 +299,15 @@ int main(void)
 		  HAL_UART_Transmit(&huart3,"TEST 7 PASS",12,1000);
 	  } else {
 		  HAL_UART_Transmit(&huart3,"TEST 7 FAIL",12,1000);
+	  }
+#endif
+#if TEST_7_ASM
+	  int32_t vectorIn[] = {1,2,3,0x10000000};
+	  uint32_t pos = asm_max(vectorIn, 4);
+	  if(pos==3){
+		  HAL_UART_Transmit(&huart3,"TEST 7 ASM PASS",15,1000);
+	  } else {
+		  HAL_UART_Transmit(&huart3,"TEST 7 ASM FAIL",15,1000);
 	  }
 #endif
 #if TEST_8
@@ -242,6 +318,17 @@ int main(void)
 		  HAL_UART_Transmit(&huart3,"TEST 8 PASS",12,1000);
 	  } else {
 		  HAL_UART_Transmit(&huart3,"TEST 8 FAIL",12,1000);
+	  }
+
+#endif
+#if TEST_8_ASM
+	  int32_t vectorIn[] = {1,2,3,4,5,6,7};
+	  int32_t vectorOut[7];
+	  asm_downsampleN(vectorIn, vectorOut, 7,3);
+	  if(vectorOut[0]==1 && vectorOut[1]==2 && vectorOut[2]==4 && vectorOut[3]==5 && vectorOut[4]==7){
+		  HAL_UART_Transmit(&huart3,"TEST 8 ASM PASS",15,1000);
+	  } else {
+		  HAL_UART_Transmit(&huart3,"TEST 8 ASM FAIL",15,1000);
 	  }
 
 #endif
@@ -261,6 +348,22 @@ int main(void)
 		  HAL_UART_Transmit(&huart3,"TEST 9 FAIL",12,1000);
 	  }
 #endif
+#if TEST_9_ASM
+	  //invertir(uint16_t * vector, uint32_t longitud)
+	  uint16_t vectorIn[] = {1,2,3,4,5,6,7};
+	  asm_invertir(vectorIn,7);
+	  if(vectorIn[0]==7
+			  && vectorIn[1]==6
+			  && vectorIn[2]==5
+			  && vectorIn[3]==4
+			  && vectorIn[4]==3
+			  && vectorIn[5]==2
+			  && vectorIn[6]==1){
+		  HAL_UART_Transmit(&huart3,"TEST 9 ASM PASS",15,1000);
+	  } else {
+		  HAL_UART_Transmit(&huart3,"TEST 9 ASM FAIL",15,1000);
+	  }
+#endif
 #if TEST_10
 	  //echo(uint16_t * vectorIn, uint32_t longitud)
 	  uint16_t vectorIn[882*2];
@@ -275,6 +378,40 @@ int main(void)
 		  HAL_UART_Transmit(&huart3,"TEST 10 PASS",12,1000);
 	  } else {
 		  HAL_UART_Transmit(&huart3,"TEST 10 FAIL",12,1000);
+	  }
+
+#endif
+#if TEST_10_ASM
+	  //echo(uint16_t * vectorIn, uint32_t longitud)
+	  uint16_t vectorIn[882*2];
+	  for(int i=0; i<882*2;i++){
+		  vectorIn[i] = 10;
+	  }
+	  asm_echo(vectorIn, 882*2);
+	  if(vectorIn[0]==10
+			  && vectorIn[881]==10
+			  && vectorIn[882]==15
+			  && vectorIn[882*2-1]==15){
+		  HAL_UART_Transmit(&huart3,"TEST 10 ASM PASS",15,1000);
+	  } else {
+		  HAL_UART_Transmit(&huart3,"TEST 10 ASM FAIL",15,1000);
+	  }
+
+#endif
+#if TEST_10_ASM_SIMD
+	  //echo(uint16_t * vectorIn, uint32_t longitud)
+	  uint16_t vectorIn[882*2];
+	  for(int i=0; i<882*2;i++){
+		  vectorIn[i] = 10;
+	  }
+	  asm_echo_simd(vectorIn, 882*2);
+	  if(vectorIn[0]==10
+			  && vectorIn[881]==10
+			  && vectorIn[882]==15
+			  && vectorIn[882*2-1]==15){
+		  HAL_UART_Transmit(&huart3,"TEST 10 ASM PASS",15,1000);
+	  } else {
+		  HAL_UART_Transmit(&huart3,"TEST 10 ASM FAIL",15,1000);
 	  }
 
 #endif
