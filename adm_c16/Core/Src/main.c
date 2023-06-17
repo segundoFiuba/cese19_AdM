@@ -170,6 +170,131 @@ int main(void)
   const uint32_t Resultado = asm_sum (5, 3);
   /* USER CODE END 2 */
 
+#if TEST_1
+	  uint32_t vector_test_zeros[3]={1,2,3};
+	  zeros(vector_test_zeros,3);
+	  if(!vector_test_zeros[0] && !vector_test_zeros[1] && !vector_test_zeros[2]){
+		  HAL_UART_Transmit(&huart3,"TEST 1 PASS",12,1000);
+	  } else {
+		  HAL_UART_Transmit(&huart3,"TEST 1 PASS",12,1000);
+	  }
+#endif
+#if TEST_2
+	  uint32_t vectorIn[] = {1,2,3,0x10000000};
+	  uint32_t vectorOut[4];
+	  uint32_t escalar=15;
+	  productoEscalar32(vectorIn, vectorOut, 4, escalar);
+	  if(vectorOut[0]==15 && vectorOut[1]==30 && vectorOut[2]==45 && vectorOut[3]==0xF0000000){
+		  HAL_UART_Transmit(&huart3,"TEST 2 PASS",12,1000);
+	  } else {
+		  HAL_UART_Transmit(&huart3,"TEST 2 FAIL",12,1000);
+	  }
+#endif
+#if TEST_3
+	  uint16_t vectorIn[] = {1,2,3,0x1000};
+	  uint16_t vectorOut[4];
+	  uint16_t escalar=15;
+	  productoEscalar16(vectorIn, vectorOut, 4, escalar);
+	  if(vectorOut[0]==15 && vectorOut[1]==30 && vectorOut[2]==45 && vectorOut[3]==0xF000){
+		  HAL_UART_Transmit(&huart3,"TEST 3 PASS",12,1000);
+	  } else {
+		  HAL_UART_Transmit(&huart3,"TEST 3 FAIL",12,1000);
+	  }
+#endif
+#if TEST_4
+	  uint16_t vectorIn[] = {1,2,3,0x1000};
+	  uint16_t vectorOut[4];
+	  uint16_t escalar=15;
+	  productoEscalar12(vectorIn, vectorOut, 4, escalar);
+	  if(vectorOut[0]==15 && vectorOut[1]==30 && vectorOut[2]==45 && vectorOut[3]==0xFFF){
+		  HAL_UART_Transmit(&huart3,"TEST 4 PASS",12,1000);
+	  } else {
+		  HAL_UART_Transmit(&huart3,"TEST 4 FAIL",12,1000);
+	  }
+#endif
+#if TEST_5
+
+#endif
+#if TEST_6
+	  uint32_t vectorIn[] = {1,2,3,0x10000000};
+	  uint16_t vectorOut[4];
+	  pack32to16(vectorIn, vectorOut, 4);
+	  if(vectorOut[0]==1 && vectorOut[1]==2 && vectorOut[2]==3 && vectorOut[3]==0xFFFF){
+		  HAL_UART_Transmit(&huart3,"TEST 6 PASS",12,1000);
+	  } else {
+		  HAL_UART_Transmit(&huart3,"TEST 6 FAIL",12,1000);
+	  }
+#endif
+#if TEST_7
+	  int32_t vectorIn[] = {1,2,3,0x10000000};
+	  uint32_t pos = max(vectorIn, 4);
+	  if(pos==3){
+		  HAL_UART_Transmit(&huart3,"TEST 7 PASS",12,1000);
+	  } else {
+		  HAL_UART_Transmit(&huart3,"TEST 7 FAIL",12,1000);
+	  }
+#endif
+#if TEST_8
+	  int32_t vectorIn[] = {1,2,3,4,5,6,7};
+	  int32_t vectorOut[7];
+	  downsampleN(vectorIn, vectorOut, 7,3);
+	  if(vectorOut[0]==1 && vectorOut[1]==2 && vectorOut[2]==4 && vectorOut[3]==5 && vectorOut[4]==7){
+		  HAL_UART_Transmit(&huart3,"TEST 8 PASS",12,1000);
+	  } else {
+		  HAL_UART_Transmit(&huart3,"TEST 8 FAIL",12,1000);
+	  }
+
+#endif
+#if TEST_9
+	  //invertir(uint16_t * vector, uint32_t longitud)
+	  uint16_t vectorIn[] = {1,2,3,4,5,6,7};
+	  invertir(vectorIn,7);
+	  if(vectorIn[0]==7
+			  && vectorIn[1]==6
+			  && vectorIn[2]==5
+			  && vectorIn[3]==4
+			  && vectorIn[4]==3
+			  && vectorIn[5]==2
+			  && vectorIn[6]==1){
+		  HAL_UART_Transmit(&huart3,"TEST 9 PASS",12,1000);
+	  } else {
+		  HAL_UART_Transmit(&huart3,"TEST 9 FAIL",12,1000);
+	  }
+#endif
+#if TEST_10
+	  //echo(uint16_t * vectorIn, uint32_t longitud)
+	  uint16_t vectorIn[882*2];
+	  for(int i=0; i<882*2;i++){
+		  vectorIn[i] = 10;
+	  }
+	  echo(vectorIn, 882*2);
+	  if(vectorIn[0]==10
+			  && vectorIn[881]==10
+			  && vectorIn[882]==15
+			  && vectorIn[882*2-1]==15){
+		  HAL_UART_Transmit(&huart3,"TEST 10 PASS",12,1000);
+	  } else {
+		  HAL_UART_Transmit(&huart3,"TEST 10 FAIL",12,1000);
+	  }
+
+#endif
+#if TEST_11
+	  //corr(int16_t *vectorX, int16_t * vectorY, int16_t* vectorCorr, uint32_t longitud)
+	  int16_t vectorX[]={1,1,1};
+	  int16_t vectorY[]={1,1,1};
+	  int16_t vectorCorr[5]={0,0,0,0,0};
+	  corr(vectorX, vectorY, vectorCorr, 3);
+	  if(vectorCorr[0]==1
+			  && vectorCorr[1]==2
+			  && vectorCorr[2]==3
+			  && vectorCorr[3]==2
+			  && vectorCorr[4]==1){
+		  HAL_UART_Transmit(&huart3,"TEST 11 PASS",12,1000);
+	  } else {
+		  HAL_UART_Transmit(&huart3,"TEST 11 FAIL",12,1000);
+	  }
+
+#endif
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1)
