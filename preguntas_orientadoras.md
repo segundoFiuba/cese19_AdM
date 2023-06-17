@@ -14,6 +14,8 @@ Cortex M| M0, M0+, M3, M4 | Microcontroladores de menor rendimiento y capacidade
 - [X] **Describa brevemente las diferencias entre las familias de procesadores Cortex M0, M3 y M4.**
       
 Mientras que los Cortex M3 y M4 están basados sobre la arquitectura ARMv7, el M0 está basado sobre ARMv6-M. Si bien estas arquitecturas son similares, el set de instrucciones de la última versión es mayor. Por otro lado, el Cortex M4 tiene soporte para más instrucciones, como son las Single Instruction Multiple Data (SIMD), y operaciones de punto flotante en algunos procesadores.
+![image](https://github.com/segundoFiuba/cese19_AdM/assets/126976212/cf53d776-0ba3-481a-a0b1-83a9827e9c7c)
+
 - [X] **¿Por qué se dice que el set de instrucciones Thumb permite mayor densidad de código? Explique**
       
 El set de instrucciones Thumb permite mayor densidad de código dado que contiene instrucciones de 16 bits, a diferencia del set de intstrucciones ARM que solo soporta instrucciones de 32 bits. Esto permite generar código que ocupe menos lugar, o bien que sea más denso.
@@ -30,6 +32,8 @@ La diferenciación entre Program Stack Pointer y Main Stack Pointer ayuda a que 
 - [X] **Describa los diferentes modos de privilegio y operación del Cortex M, sus relaciones y como se conmuta de uno al otro. Describa un ejemplo en el que se pasa del modo privilegiado a no priviligiado y nuevamente a privilegiado.**
       
 El Cortex M3/M4 tiene dos modos de privilegio, un modo privilegiado y un modo no priviliegiado. En el modo no privilegiado se puede, a través del MPU, evitar que una tarea no privilegiada acceda a partes de la memoria que no debe, como pueden ser los registros de las iterrupciones. Además, esto ayuda a permitir la ejecución de sistemas operativos, en que las tareas corren con acceso limitado a la memoria, y el SO puede acceder a toda la memoria.
+![image](https://github.com/segundoFiuba/cese19_AdM/assets/126976212/65eecf02-ed03-4f3d-83c7-d26751fdb417)
+
 - [X] **¿Qué se entiende por modelo de registros ortogonal? Dé un ejemplo**
       
 El modelo otrogonal se refiere a que las instrucciones y los modos de address son independientes, lo que significa que las instrucciones pueden llamar de distintos modos.
