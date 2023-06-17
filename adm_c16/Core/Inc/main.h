@@ -107,8 +107,22 @@ void Error_Handler(void);
 #define RMII_TXD0_GPIO_Port GPIOG
 #define LD2_Pin GPIO_PIN_7
 #define LD2_GPIO_Port GPIOB
+#define DELAY_SAMPLES  882
 
-/* USER CODE BEGIN Private defines */
+
+void zeros(uint32_t * array, uint32_t len);
+void productoEscalar32(uint32_t * vectorIn, uint32_t * vectorOut, uint32_t longitud, uint32_t escalar);
+void productoEscalar16(uint16_t * vectorIn, uint16_t * vectorOut, uint32_t longitud, uint16_t escalar);
+void productoEscalar12(uint16_t * vectorIn, uint16_t * vectorOut, uint32_t longitud, uint16_t escalar);
+void filtroVentana10(uint16_t * vectorIn, uint16_t * vectorOut, uint32_t longitudVectorIn);
+void pack32to16(int32_t * vectorIn, int16_t *vectorOut, uint32_t longitud);
+int32_t max(int32_t * vectorIn, uint32_t longitud);
+void downsampleN(int32_t * vectorIn, int32_t * vectorOut, uint32_t longitud, uint32_t N);
+void invertir(uint16_t * vector, uint32_t longitud);
+void echo(uint16_t * vectorIn, uint32_t longitud);
+void corr(int16_t *vectorX, int16_t * vectorY, int16_t* vectorCorr, uint32_t longitud);
+void corr2(int16_t *vectorX, uint32_t longitudX, int16_t * vectorY, uint32_t longitudY, int16_t* vectorCorr);
+void filtroVentana10_2(uint16_t * vectorIn, uint16_t * vectorOut, uint32_t longitudVectorIn);
 
 /* USER CODE END Private defines */
 

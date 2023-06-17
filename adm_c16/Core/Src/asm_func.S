@@ -59,7 +59,7 @@
 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 @ Prototipo en "C":
 @   void zeros(uint32_t * array, uint32_t len)
-@	r0 direction of array
+@	r0 address of array
 @	r1 length of array
 .thumb_func
     asm_zeros:
@@ -76,8 +76,8 @@
 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 @ Prototipo en "C":
 @   void productoEscalar32(uint32_t * vectorIn, uint32_t * vectorOut, uint32_t longitud, uint32_t escalar)
-@	r0 direction of vectorIn
-@	r1 direction of vectorOut
+@	r0 address of vectorIn
+@	r1 address of vectorOut
 @	r2 lenght of arrays
 @	r3 factor
 .thumb_func
@@ -99,8 +99,8 @@
 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 @ Prototipo en "C":
 @   void productoEscalar16(uint16_t * vectorIn, uint16_t * vectorOut, uint16_t longitud, uint16_t escalar)
-@	r0 direction of vectorIn
-@	r1 direction of vectorOut
+@	r0 address of vectorIn
+@	r1 address of vectorOut
 @	r2 lenght of arrays
 @	r3 factor
 .thumb_func
@@ -122,8 +122,8 @@
 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 @ Prototipo en "C":
 @   void productoEscalar12(uint16_t * vectorIn, uint16_t * vectorOut, uint32_t longitud, uint16_t escalar)
-@	r0 direction of vectorIn
-@	r1 direction of vectorOut
+@	r0 address of vectorIn
+@	r1 address of vectorOut
 @	r2 lenght of arrays
 @	r3 factor
 .thumb_func
@@ -145,8 +145,8 @@
 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 @ Prototipo en "C":
 @   iltroVentana10(uint16_t * vectorIn, uint16_t * vectorOut, uint32_t longitudVectorIn)
-@	r0 direction of vectorIn
-@	r1 direction of vectorOut
+@	r0 address of vectorIn
+@	r1 address of vectorOut
 @	r2 lenght of arrays
 .thumb_func
 	asm_filtroVentana:
@@ -155,8 +155,8 @@
 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 @ Prototipo en "C":
 @   void pack32to16(int32_t * vectorIn, int16_t *vectorOut, uint32_t longitud)
-@	r0 direction of vectorIn
-@	r1 direction of vectorOut
+@	r0 address of vectorIn
+@	r1 address of vectorOut
 @	r2 lenght of arrays
 .thumb_func
 	asm_pack32to16:
@@ -186,14 +186,14 @@
 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 @ Prototipo en "C":
 @ 	int32_t  max(int32_t * vectorIn, uint32_t longitud)
-@	r0 direction of vectorIn
+@	r0 address of vectorIn
 @	r1 longitud
 .thumb_func
 	asm_max:
 		cbz r0, exit_max @ compare with null pointer, exit if true
     	cbz r1, exit_max @ compare with null pointer, exit if true
     	ldr r2, [r0]@ copy the value to the buffer
-    	mov r3, #0 @ direction of maximum value
+    	mov r3, #0 @ address of maximum value
     	push {r4-r5}
     	mov r5, #0 @ counting variable
     max_loop:
@@ -218,8 +218,8 @@
 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 @ Prototipo en "C":
 @   downsampleN(int32_t * vectorIn, int32_t * vectorOut, uint32_t longitud, uint32_t N)
-@	r0 direction of vectorIn
-@	r1 direction of vectorOut
+@	r0 address of vectorIn
+@	r1 address of vectorOut
 @	r2 lenght of arrays
 @	r3 N
 .thumb_func
@@ -251,7 +251,7 @@
 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 @ Prototipo en "C":
 @   invertir(uint16_t * vector, uint32_t longitud)
-@	r0 direction of vector
+@	r0 address of vector
 @	r1 lenght of array
 .thumb_func
 	asm_invertir:
@@ -277,7 +277,7 @@
 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 @ Prototipo en "C":
 @   void echo(uint16_t * vectorIn, uint32_t longitud)
-@	r0 direction of vectorIn
+@	r0 address of vectorIn
 @	r1 lenght of array
 .thumb_func
 	asm_echo:
@@ -303,7 +303,7 @@
 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 @ Prototipo en "C":
 @   void echo(uint16_t * vectorIn, uint32_t longitud)
-@	r0 direction of vectorIn
+@	r0 address of vectorIn
 @	r1 lenght of array
 .thumb_func
 	asm_echo_simd:
@@ -329,11 +329,21 @@
 
 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 @ Prototipo en "C":
-@   void productoEscalar12(uint16_t * vectorIn, uint16_t * vectorOut, uint32_t longitud, uint16_t escalar)
-@	r0 direction of vectorIn
-@	r1 direction of vectorOut
-@	r2 lenght of arrays
-@	r3 factor
+@   void corr(int16_t *vectorX, int16_t * vectorY, int16_t* vectorCorr, uint32_t longitud)
+@	r0 address of vectorX
+@	r1 address of vectorY
+@	r2 address of vectorCorr
+@	r3 len
 .thumb_func
 	asm_corr:
+		cbz r0, exit_corr
+		cbz r1, exit_corr
+		cbz r2, exit_corr
+		cbz r3, exit_corr
+		lsr r4, r3, #2 @copy the length * 2 into r4
+		add r1, r4 @make the pointer of Y point to the last element
+
+	asm_corr_loop:
+
+	exit_corr:
 		bx lr
