@@ -152,7 +152,7 @@
     	cbz r1, exit_pack @ compare with null pointer, exit if true
     	cbz r2, exit_pack @ compare with zero, exit if true
 	pack_loop:
-		ldr r3, #4095
+		mov r3, #4095
 		cmp r0, r3
 		bgt branch_upper_limit
 		mov r3, r0
@@ -179,8 +179,8 @@
     	cbz r1, exit_max @ compare with null pointer, exit if true
     	ldr r2, [r0]@ copy the value to the buffer
     	mov r3, #0 @ direction of maximum value
-    	mov r5, #0 @ counting variable
     	push {r4-r5}
+    	mov r5, #0 @ counting variable
     max_loop:
     	ldr r4, [r0], #4 @load to r4 the value of r0, and increment r0 one word
     	cmp r2, r4 @compare r0 with current max
@@ -195,7 +195,6 @@
     	mov r3, r5 @set the location of maximum value to counter
     	subs r2, #1 @decrease the longitud
     	bne max_loop
-    	b exit_max
     exit_max:
         mov r0, r3 @copy return value to r0
         pop {r4-r5} @restore
@@ -203,24 +202,59 @@
 
 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 @ Prototipo en "C":
-@   void productoEscalar12(uint16_t * vectorIn, uint16_t * vectorOut, uint32_t longitud, uint16_t escalar)
+@   downsampleN(int32_t * vectorIn, int32_t * vectorOut, uint32_t longitud, uint32_t N)
 @	r0 direction of vectorIn
 @	r1 direction of vectorOut
 @	r2 lenght of arrays
-@	r3 factor
+@	r3 N
 .thumb_func
 	asm_downsampleN:
+		cbz r0, exit_downsample @ compare with null pointer, exit if true
+    	cbz r1, exit_downsample @ compare with null pointer, exit if true
+    	cbz r2, exit_downsample @ compare length to 0, exit if true
+    	cbz r3, exit_downsample @ compare N to 0, exit if true
+    	push {r4} @push r4, popping later
+    	mov r4, #1 @used to compare with N
+	downsample_loop:
+		cmp r4, r3 @compare N to looping variable
+		beq equal_downsample @if equal dont store it
+		str r1, [r0], #4 @if not equal store it
+		add r4, #1 @increase the looping variable
+		subs r2,#1 @decrease length, set ASPR
+		bne downsample_loop @if length is not zero loop again
+		b exit_downsample @if length is zero exit
+	equal_downsample:
+		mov r4, #1 @if equal then restore looping variable to zero
+		subs r2, #1 @substract from length, set ASPR
+		bne downsample_loop @if not zero loop again
+	exit_downsample:
+		pop {r4}
 		bx lr
 
 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 @ Prototipo en "C":
-@   void productoEscalar12(uint16_t * vectorIn, uint16_t * vectorOut, uint32_t longitud, uint16_t escalar)
-@	r0 direction of vectorIn
-@	r1 direction of vectorOut
-@	r2 lenght of arrays
-@	r3 factor
+@   invertir(uint16_t * vector, uint32_t longitud)
+@	r0 direction of vector
+@	r1 lenght of array
 .thumb_func
 	asm_invertir:
+		cbz r0, exit_invertir @ compare with null pointer, exit if true
+    	cbz r1, exit_invertir @ compare with zero, exit if true
+    	push {r4} @push r4
+    	mov r3, r1 @load the length into r3
+    	mov r4, r0 @load the address of the vector in r4
+	invertir_push_loop:
+		ldr r2, [r0], #4 @ read the value in r0 then move r0 one word
+		push {r2} @ push the value to the stack
+		subs r1, #1 @ substract one from length, update ASPR
+		bne invertir_push_loop
+	invertir_pop_loop:
+		pop {r2} @get the last item from the stack
+		ldr r4, [r2], #4 @save that value in r4, which is the address of the vector, and increase 4
+		subs r3, #1
+		bne invertir_pop_loop
+	exit_invertir:
+		pop {r4}
 		bx lr
 
 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
@@ -230,7 +264,23 @@
 @	r1 lenght of array
 .thumb_func
 	asm_echo:
-
+		cbz r0, exit_echo @ compare with null pointer, exit if true
+		push{r4-r5}
+		mov r5, #882
+		subs r1, r5 @compare with minimum size
+		bmi exit_echo @if negative exit
+		mov r2, r0 @r4 has address of vectorIn
+		add r2, #1764 @r4 has address of vectorIn+882 halfwords
+	echo_loop:
+		ldrh r3, [r0], #2 @load one halfword into r3
+		asr r3, 1 @divide by two
+		ldrh r4, [r2] @ load the value of the destination halfword
+		qadd16 r3, r3, r4 @ saturated add
+		strh r3, [r2], #2 @ store the result
+		subs r1, #1
+		bne echo_loop
+	exit_echo:
+		pop{r4-r5}
 		bx lr
 
 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
@@ -242,6 +292,28 @@
 @	r3 factor
 .thumb_func
 	asm_echo_simd:
+		cbz r0, exit_echo @ compare with null pointer, exit if true
+		push{r4-r6}
+		mov r5, #882
+		subs r1, r5 @compare with minimum size
+		bmi exit_echo @if negative exit
+		mov r2, r0 @r4 has address of vectorIn
+		add r2, #1764 @r4 has address of vectorIn+882 halfwords
+	echo_simd_loop:
+		ldr r3, [r0], #4 @load two halfwords into r3
+		lsr r5, r3, #16 @shift to get the upper halfword in r5
+		asr r5, #1 @divide by two
+		lsl r6, r3, #16 @shift to remove the upper halfword
+		lsr r6, r6, #16 @shift to return the lower halfword
+		asr r6, #1 @divide by two
+		orr r3, r5, r6 @return both divided halfwords to r3
+		ldr r4, [r2] @load two destination halfwords into r4
+		shadd16 r3, r3, r4 @SIMD add the two halfwords
+		strh r3, [r2], #4 @store the result then move two halfwords
+		subs r1, #2
+		bne echo_loop
+	exit_echo_simd:
+		pop{r4-r6}
 		bx lr
 
 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
