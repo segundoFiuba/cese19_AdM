@@ -302,33 +302,27 @@
 
 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 @ Prototipo en "C":
-@   void productoEscalar12(uint16_t * vectorIn, uint16_t * vectorOut, uint32_t longitud, uint16_t escalar)
+@   void echo(uint16_t * vectorIn, uint32_t longitud)
 @	r0 direction of vectorIn
-@	r1 direction of vectorOut
-@	r2 lenght of arrays
-@	r3 factor
+@	r1 lenght of array
 .thumb_func
 	asm_echo_simd:
 		cbz r0, exit_echo_simd @ compare with null pointer, exit if true
 		push {r4-r6}
 		mov r5, #882
 		subs r1, r5 @compare with minimum size
-		bmi exit_echo @if negative exit
+		bmi exit_echo_simd @if negative exit
 		mov r2, r0 @r4 has address of vectorIn
 		add r2, #1764 @r4 has address of vectorIn+882 halfwords
 	echo_simd_loop:
 		ldr r3, [r0], #4 @load two halfwords into r3
-		lsr r5, r3, #16 @shift to get the upper halfword in r5
-		asr r5, #1 @divide by two
-		lsl r6, r3, #16 @shift to remove the upper halfword
-		lsr r6, r6, #16 @shift to return the lower halfword
-		asr r6, #1 @divide by two
-		orr r3, r5, r6 @return both divided halfwords to r3
+		lsr r3, #1 @shift to divide by two with carry from the higher halfword
+		and r3, r3, #0xFFFF7FFF @remove the carry from the higher halfword
 		ldr r4, [r2] @load two destination halfwords into r4
-		shadd16 r3, r3, r4 @SIMD add the two halfwords
-		strh r3, [r2], #4 @store the result then move two halfwords
+		sadd16 r3, r3, r4 @SIMD add the two halfwords
+		str r3, [r2], #4 @store the result then move two halfwords
 		subs r1, #2
-		bne echo_loop
+		bne echo_simd_loop
 	exit_echo_simd:
 		pop {r4-r6}
 		bx lr
